@@ -2,20 +2,15 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+    <div class="row justify-content-left">
+        <div class="col-md-3">
             <div class="card">
-                <div class="card-header">{{ $user->email }}</div>
-
+                <div class="card-header text-center"><h3 class="m-0">Your Lists</h3></div>
                 <div class="card-body">
+                    @foreach ($user->lists as $list)
+                        <h5 class="m-0">{{ $list->name }}</h5> <br>
+                    @endforeach
                     
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    You are logged in!
                 </div>
             </div>
         </div>
