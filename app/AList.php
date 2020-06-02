@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AList extends Model
 {
+    protected $guarded = [];
     protected $table = 'lists';
     public function user(){
         return $this->belongsTo(User::class);

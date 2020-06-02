@@ -12,6 +12,19 @@ class AjaxController extends Controller
     public function index(Request $request) {
         $id = $request->listId;
         $tasks = AList::find($id)->tasks;
-        return $tasks->pluck('task');
+        if(AList::find($id)->user->id == auth()->user()->id){
+            return $tasks->pluck('task');
+        }
+        else{
+            abort(404);
+        }
      }
+    public function store(Request $request){
+        $id = $request->userId;
+        $listName = $request->newListName;
+        AList::create([
+            'user_id' => $id,
+            'name' => $listName
+        ]);
+    }
 }

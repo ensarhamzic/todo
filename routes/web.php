@@ -22,3 +22,4 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::post('/list', 'AjaxController@index');
+Route::post('/list/store', 'AjaxController@store');
