@@ -11,7 +11,7 @@
                 <div class="card-header text-center"><h3 class="m-0">Your Lists</h3></div>
                 <div class="card-body">
                     @foreach ($user->lists as $list)
-                        <a href="javascript:onClick=showList({{ $list->id }})"><h5 class="m-0">{{ $list->name }}</h5></a> <br>
+                        <a href="javascript:onClick=showList({{ $list->id }})"><h5 class="m-0" id="list{{ $list->id }}">{{ $list->name }}</h5></a> <br>
                     @endforeach
                     
                 </div>
@@ -20,7 +20,7 @@
         <div class="col-md-9">
             <div class="card">
                 <div class="card-header text-center">
-                    
+                    <h3 id="listName" class="m-0"></h3>
                 </div>
                 <div class="card-body" id="tasks">
 
@@ -34,6 +34,7 @@
 <script>
     var oneTask;
     function showList(id){
+        
         $.ajax({
                 type:'POST',
                 url:'/list',
@@ -46,7 +47,8 @@
                         oneTask.addClass("task");
                         $("#tasks").append(oneTask);
                     }
-
+                    listName = $('#list'+id).html();
+                    $('#listName').html(listName);
                 }
             });
     }
