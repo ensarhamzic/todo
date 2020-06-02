@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class AList extends Model
 {
-    public $table = 'lists';
+    protected $table = 'lists';
     public function user(){
         return $this->belongsTo(User::class);
+    }
+    public function tasks(){
+        return $this->hasMany(Task::class);
     }
 
 }
