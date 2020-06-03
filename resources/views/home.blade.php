@@ -35,7 +35,13 @@
                     <h3 id="listName" class="m-0"></h3>
                 </div>
                 <div class="card-body" id="tasks">
+                    <form class="taskForm" action="javascript:newTask({{ $user->id }}, {{ $user->lists->pluck('id') }})" method="post">
+                        <input type="text" name="task" id="task" placeholder="New task...">
+                        <input type="submit" class="d-none">
+                    </form>
+                    <div id="tasksDiv">
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,21 +52,25 @@
 <script>
     var oneTask;
     function showList(id){
-        
+
         $.ajax({
                 type:'POST',
                 url:'/list',
                 data:{_token: "{{ csrf_token() }}", listId: id
                 },
                 success: function( tasks ) {
-                    $("#tasks").html("");
+                    $("#tasksDiv").html("");
                     for(i=0;i<tasks.length;i++) {
                         oneTask = $("<h4></h4>").text(tasks[i]);
                         oneTask.addClass("task");
-                        $("#tasks").append(oneTask);
+                        $("#tasksDiv").append(oneTask);
                     }
                     listName = $('#list'+id).html();
                     $('#listName').html(listName);
+                    taskForm = $('.taskForm');
+                    taskListId = "list"+id;
+                    taskForm.attr('id', taskListId);
+                    console.log(taskForm);
                 }
             });
     }
@@ -81,6 +91,18 @@
                     newList.attr('href', "javascript:onClick=showList("+listId+")");
                     newList.html("<h5 class='m-0' id='list"+listId+"'>"+listName+"</h5><br>");
                     $("#listsDiv").append(newList);
+                }
+            });
+    }
+
+    function newTask(id, listIds){
+        $.ajax({
+                type:'POST',
+                url:'/tasks/create',
+                data:{_token: "{{ csrf_token() }}", userId: id, taskName: $('#task').val(), ids: listIds
+                },
+                success: function( data ) {
+                    console.log(data);
                 }
             });
     }
