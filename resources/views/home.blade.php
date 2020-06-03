@@ -14,13 +14,15 @@
                     <i class="fas fa-plus fa-2x float-right" onclick="newList()"></i>
                 </div>
                 <div class="card-body" id="listsCard">
-                    @foreach ($user->lists as $list)
-                        <a href="javascript:onClick=showList({{ $list->id }})"><h5 class="m-0" id="list{{ $list->id }}">{{ $list->name }}</h5></a> <br>
-                    @endforeach
-                    <form id="newListForm" class="invisible" action="javascript:storeList({{ $user->id }})" method="POST">
+                    <div id="listsDiv">
+                        @foreach ($user->lists as $list)
+                            <a href="javascript:onClick=showList({{ $list->id }})"><h5 class="m-0{{ $loop->first ? ' mt-3' : '' }}" id="list{{ $list->id }}">{{ $list->name }}</h5></a> <br>
+                        @endforeach
+                    </div>
+                    <form id="newListForm" class="d-none" action="javascript:storeList({{ $user->id }})" method="POST">
                         @csrf
                         <label for="newListName">New List Name:</label><br>
-                        <input type="text" id="newListName" name="name" class="w-100">
+                        <input type="text" id="newListName" name="name" class="w-100"><br><br>
                         <input type="submit">
                     </form>
                 </div>
@@ -63,8 +65,8 @@
             });
     }
     function newList(){
-        $('#newListForm').removeClass('invisible');
-        $('#newListForm').addClass('visible');
+        $('#newListForm').removeClass('d-none');
+        $('#newListForm').addClass('d-block');
     }
     function storeList(id){
         $.ajax({
@@ -73,7 +75,12 @@
                 data:{_token: "{{ csrf_token() }}", userId: id, newListName: $('#newListName').val()
                 },
                 success: function( data ) {
-                    $("#listsCard").append("");
+                    listId = data[0];
+                    listName = data[1];
+                    var newList = $('<a></a>')
+                    newList.attr('href', "javascript:onClick=showList("+listId+")");
+                    newList.html("<h5 class='m-0' id='list"+listId+"'>"+listName+"</h5><br>");
+                    $("#listsDiv").append(newList);
                 }
             });
     }

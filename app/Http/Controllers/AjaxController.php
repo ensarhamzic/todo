@@ -22,9 +22,11 @@ class AjaxController extends Controller
     public function store(Request $request){
         $id = $request->userId;
         $listName = $request->newListName;
-        AList::create([
+        $newList = AList::create([
             'user_id' => $id,
             'name' => $listName
         ]);
+        $data = [$newList->id, $newList->name];
+        return $data;
     }
 }
