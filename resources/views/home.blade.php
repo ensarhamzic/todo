@@ -35,7 +35,7 @@
                     <h3 id="listName" class="m-0"></h3>
                 </div>
                 <div class="card-body" id="tasks">
-                    <form class="taskForm" action="javascript:newTask({{ $user->id }}, {{ $user->lists->pluck('id') }})" method="post">
+                    <form class="taskForm" action="javascript:onClick=newTask({{ $user->id }}, {{ $user->lists->pluck('id') }})" method="post">
                         <input type="text" name="task" id="task" placeholder="New task...">
                         <input type="submit" class="d-none">
                     </form>
@@ -70,7 +70,6 @@
                     taskForm = $('.taskForm');
                     taskListId = "list"+id;
                     taskForm.attr('id', taskListId);
-                    console.log(taskForm);
                 }
             });
     }
@@ -85,25 +84,34 @@
                 data:{_token: "{{ csrf_token() }}", userId: id, newListName: $('#newListName').val()
                 },
                 success: function( data ) {
-                    listId = data[0];
-                    listName = data[1];
-                    var newList = $('<a></a>')
-                    newList.attr('href', "javascript:onClick=showList("+listId+")");
-                    newList.html("<h5 class='m-0' id='list"+listId+"'>"+listName+"</h5><br>");
-                    $("#listsDiv").append(newList);
+                    if(data.length = 2){
+                        listId = data[0];
+                        listName = data[1];
+                        var newList = $('<a></a>')
+                        newList.attr('href', "javascript:onClick=showList("+listId+")");
+                        newList.html("<h5 class='m-0' id='list"+listId+"'>"+listName+"</h5><br>");
+                        $("#listsDiv").append(newList);
+                    }
+                    else {
+                        console.log(data);
+                    }
                 }
             });
     }
 
     function newTask(id, listIds){
+        taskFormId = $('.taskForm').attr('id');
+        taskFormId = taskFormId.replace('list','');
         $.ajax({
-                type:'POST',
-                url:'/tasks/create',
-                data:{_token: "{{ csrf_token() }}", userId: id, taskName: $('#task').val(), ids: listIds
-                },
-                success: function( data ) {
-                    console.log(data);
-                }
-            });
+            type:'POST',
+            url:'/tasks/create',
+            data:{_token: "{{ csrf_token() }}", userId: id, taskName: $('#task').val(), ids: listIds, listId: taskFormId
+            },
+            success: function( data ) {
+                oneTask = $("<h4></h4>").text(data);
+                oneTask.addClass("task");
+                $("#tasksDiv").append(oneTask);
+            }
+        });
     }
 </script>

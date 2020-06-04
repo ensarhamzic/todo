@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\AList;
+use App\Task;
 
 class AjaxController extends Controller
 {
@@ -36,10 +36,12 @@ class AjaxController extends Controller
     }
     public function create(Request $request){
         $num = 0;
+        $numEnd = 0;
         $id = $request->userId;
         if($id == auth()->user()->id){
             $taskName = $request->taskName;
             $ids = $request->ids;
+            $listId = $request->listId;
             $allIds = auth()->user()->lists->pluck('id');
             if(count($allIds) == count($ids)){
                 for($i = 0; $i < count($allIds); $i++){
@@ -47,7 +49,19 @@ class AjaxController extends Controller
                         $num+=1;
                     }
                     if($num == count($allIds)){
-                        return "a";
+                        for($i = 0; $i < count($ids); $i++){
+                            if($ids[$i] == $listId){
+                                $numEnd+=1;
+                            }
+                            if($numEnd == 1){
+                                $newTask = Task::create([
+                                    'a_list_id' => $listId,
+                                    'task' => $taskName,
+                                    'completed' => 0
+                                ]);
+                                return $taskName;
+                            }
+                        }
                     }
                 }
             }
