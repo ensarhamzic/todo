@@ -22,7 +22,7 @@
                     <form id="newListForm" class="d-none" action="javascript:storeList({{ $user->id }})" method="POST">
                         @csrf
                         <label for="newListName">New List Name:</label><br>
-                        <input type="text" id="newListName" name="name" class="w-100"><br><br>
+                        <input type="text" id="newListName" name="name" class="w-100" autocomplete="off"><br><br>
                         <input type="submit">
                     </form>
                 </div>
@@ -35,8 +35,8 @@
                     <h3 id="listName" class="m-0"></h3>
                 </div>
                 <div class="card-body" id="tasks">
-                    <form class="taskForm" action="javascript:onClick=newTask({{ $user->id }}, {{ $user->lists->pluck('id') }})" method="post">
-                        <input type="text" name="task" id="task" placeholder="New task...">
+                    <form class="taskForm d-none" action="javascript:onClick=newTask({{ $user->id }})" method="post">
+                        <input type="text" name="task" id="task" placeholder="New task..." autocomplete="off">
                         <input type="submit" class="d-none">
                     </form>
                     <div id="tasksDiv">
@@ -52,7 +52,6 @@
 <script>
     var oneTask;
     function showList(id){
-
         $.ajax({
                 type:'POST',
                 url:'/list',
@@ -70,6 +69,8 @@
                     taskForm = $('.taskForm');
                     taskListId = "list"+id;
                     taskForm.attr('id', taskListId);
+                    $('.taskForm').removeClass('d-none');
+                    $('.taskForm').addClass('d-block');
                 }
             });
     }
@@ -91,27 +92,31 @@
                         newList.attr('href', "javascript:onClick=showList("+listId+")");
                         newList.html("<h5 class='m-0' id='list"+listId+"'>"+listName+"</h5><br>");
                         $("#listsDiv").append(newList);
-                    }
-                    else {
-                        console.log(data);
+                        $('#newListName').val('');
+                        $('#newListForm').removeClass('d-block');
+                        $('#newListForm').addClass('d-none');
                     }
                 }
             });
     }
 
-    function newTask(id, listIds){
+    function newTask(id){
         taskFormId = $('.taskForm').attr('id');
         taskFormId = taskFormId.replace('list','');
-        $.ajax({
+        if(taskFormId !== '') {
+            $.ajax({
             type:'POST',
             url:'/tasks/create',
-            data:{_token: "{{ csrf_token() }}", userId: id, taskName: $('#task').val(), ids: listIds, listId: taskFormId
+            data:{_token: "{{ csrf_token() }}", userId: id, taskName: $('#task').val(), listId: taskFormId
             },
             success: function( data ) {
                 oneTask = $("<h4></h4>").text(data);
                 oneTask.addClass("task");
                 $("#tasksDiv").append(oneTask);
+                $('#task').val('');
             }
         });
+        }
+        
     }
 </script>
