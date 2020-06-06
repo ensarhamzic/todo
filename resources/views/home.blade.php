@@ -16,7 +16,7 @@
                 <div class="card-body" id="listsCard">
                     <div id="listsDiv">
                         @foreach ($user->lists as $list)
-                            <a href="javascript:onClick=showList({{ $list->id }})"><h5 class="m-0{{ $loop->first ? ' mt-3' : '' }}" id="list{{ $list->id }}">{{ $list->name }}</h5></a> <br>
+                            <a href="javascript:onClick=showList({{ $list->id }})"><h5 class="m-0{{ $loop->first ? ' mt-3' : '' }}" id="list{{ $list->id }}">{{ $list->name }}</h5><br></a> 
                         @endforeach
                     </div>
                     <form id="newListForm" class="d-none" action="javascript:storeList({{ $user->id }})" method="POST">
@@ -31,8 +31,10 @@
         </div>
         <div class="col-md-9">
             <div class="card">
-                <div class="card-header text-center">
-                    <h3 id="listName" class="m-0"></h3>
+                <div class="card-header d-flex justify-content-between">
+                        <h3 id="listName" class="my-auto"></h3>
+                        <i class="fas fa-trash text-danger align-middle my-auto" onClick="deleteList()"></i>
+                    
                 </div>
                 <div class="card-body" id="tasks">
                     <form class="taskForm d-none" action="javascript:onClick=newTask({{ $user->id }})" method="post">
@@ -67,7 +69,7 @@
                     listName = $('#list'+id).html();
                     $('#listName').html(listName);
                     taskForm = $('.taskForm');
-                    taskListId = "list"+id;
+                    taskListId = "lists"+id;
                     taskForm.attr('id', taskListId);
                     $('.taskForm').removeClass('d-none');
                     $('.taskForm').addClass('d-block');
@@ -102,7 +104,8 @@
 
     function newTask(id){
         taskFormId = $('.taskForm').attr('id');
-        taskFormId = taskFormId.replace('list','');
+        console.log(taskFormId);
+        taskFormId = taskFormId.replace('lists','');
         if(taskFormId !== '') {
             $.ajax({
             type:'POST',
@@ -117,6 +120,25 @@
             }
         });
         }
-        
+    }
+
+    function deleteList(){
+        listId = $('.taskForm').attr('id');
+        listId = listId.replace('lists','');
+        if(listId !== '') {
+            $.ajax({
+            type:'POST',
+            url:'/list/delete',
+            data:{_token: "{{ csrf_token() }}", idList: listId
+            },
+            success: function( data ) {
+                $("#list"+listId).parent().remove();
+                $('.taskForm').removeClass('d-block');
+                $('.taskForm').addClass('d-none');
+                $('#listName').html('');
+                $('.task').html('');
+            }
+        });
+        }
     }
 </script>

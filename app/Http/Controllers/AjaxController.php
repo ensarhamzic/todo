@@ -37,8 +37,6 @@ class AjaxController extends Controller
     }
     public function create(Request $request)
     {
-        $num = 0;
-        $numEnd = 0;
         $id = $request->userId;
         if ($id == auth()->user()->id) {
             $taskName = $request->taskName;
@@ -51,6 +49,15 @@ class AjaxController extends Controller
                 ]);
                 return $taskName;
             }
+        }
+    }
+
+    public function delete(Request $request)
+    {
+        $listId = $request->idList;
+        if(auth()->user()->lists->pluck('id')->contains($listId)){
+            $list = AList::find($listId);
+            $list->delete();
         }
     }
 }

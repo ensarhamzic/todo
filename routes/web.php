@@ -24,3 +24,4 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::post('/list', 'AjaxController@index');
 Route::post('/list/store', 'AjaxController@store');
 Route::post('/tasks/create', 'AjaxController@create');
+Route::post('/list/delete', 'AjaxController@delete');
