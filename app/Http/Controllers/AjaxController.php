@@ -70,7 +70,6 @@ class AjaxController extends Controller
         $taskId = $request->taskId;
         $listId = Task::find($taskId)->list->id;
         if(auth()->user()->lists->pluck('id')->contains($listId)){
-            return auth()->user()->lists->pluck('id');
             $task = Task::find($taskId);
             $task->delete();
         }
