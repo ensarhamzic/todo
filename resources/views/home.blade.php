@@ -61,10 +61,15 @@
                 },
                 success: function( tasks ) {
                     $("#tasksDiv").html("");
-                    for(i=0;i<tasks.length;i++) {
-                        oneTask = $("<h4></h4>").text(tasks[i]);
+                    for(i=0;i<tasks[1].length;i++) {
+                        div = $('<div></div>');
+                        div.addClass('justify-content-between d-flex tasksDiv');
+                        oneTask = $("<h4></h4>").text(tasks[1][i]);
                         oneTask.addClass("task");
-                        $("#tasksDiv").append(oneTask);
+                        div.append(oneTask);
+                        modifyDiv = $('<div></div>').html('<i class="fas fa-2x fa-check mr-4 text-info"></i><i onClick=deleteTask('+tasks[0][i]+') class="fas fa-2x fa-times text-danger"></i>');
+                        div.append(modifyDiv);
+                        $("#tasksDiv").append(div);
                     }
                     listName = $('#list'+id).html();
                     $('#listName').html(listName);
@@ -104,7 +109,6 @@
 
     function newTask(id){
         taskFormId = $('.taskForm').attr('id');
-        console.log(taskFormId);
         taskFormId = taskFormId.replace('lists','');
         if(taskFormId !== '') {
             $.ajax({
@@ -113,9 +117,14 @@
             data:{_token: "{{ csrf_token() }}", userId: id, taskName: $('#task').val(), listId: taskFormId
             },
             success: function( data ) {
-                oneTask = $("<h4></h4>").text(data);
+                div = $('<div></div>');
+                div.addClass('justify-content-between d-flex tasksDiv');
+                oneTask = $("<h4></h4>").text(data[1]);
                 oneTask.addClass("task");
-                $("#tasksDiv").append(oneTask);
+                div.append(oneTask);
+                modifyDiv = $('<div></div>').html('<i class="fas fa-2x fa-check mr-4 text-info"></i><i onClick=deleteTask('+data[0]+') class="fas fa-2x fa-times text-danger"></i>');
+                div.append(modifyDiv);
+                $("#tasksDiv").append(div);
                 $('#task').val('');
             }
         });
@@ -136,7 +145,21 @@
                 $('.taskForm').removeClass('d-block');
                 $('.taskForm').addClass('d-none');
                 $('#listName').html('');
-                $('.task').html('');
+                $('.tasksDiv').html('');
+            }
+        });
+        }
+    }
+
+    function deleteTask(id){
+        if(id !== ""){
+            $.ajax({
+            type:'POST',
+            url:'/task/delete',
+            data:{_token: "{{ csrf_token() }}", taskId: id
+            },
+            success: function( data ) {
+                console.log(data);
             }
         });
         }

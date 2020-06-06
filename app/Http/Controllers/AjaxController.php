@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -13,7 +14,10 @@ class AjaxController extends Controller
         $id = $request->listId;
         $tasks = AList::find($id)->tasks;
         if (AList::find($id)->user->id == auth()->user()->id) {
-            return $tasks->pluck('task');
+            $ids = $tasks->pluck('id');
+            $names = $tasks->pluck('task');
+            $data = [$ids, $names];
+            return $data;
         } else {
             abort(404);
         }
@@ -23,7 +27,7 @@ class AjaxController extends Controller
         $id = $request->userId;
         if ($id == auth()->user()->id) {
             $listName = $request->newListName;
-            if($listName !== ''){
+            if ($listName !== '') {
                 $newList = AList::create([
                     'user_id' => $id,
                     'name' => $listName
@@ -31,9 +35,7 @@ class AjaxController extends Controller
                 $data = [$newList->id, $newList->name];
                 return $data;
             }
-            
-        }
-        else abort(404);
+        } else abort(404);
     }
     public function create(Request $request)
     {
@@ -41,13 +43,15 @@ class AjaxController extends Controller
         if ($id == auth()->user()->id) {
             $taskName = $request->taskName;
             $listId = $request->listId;
-            if(auth()->user()->lists->pluck('id')->contains($listId)){
+            if (auth()->user()->lists->pluck('id')->contains($listId)) {
                 $newTask = Task::create([
                     'a_list_id' => $listId,
                     'task' => $taskName,
                     'completed' => 0
                 ]);
-                return $taskName;
+                $newTaskId = $newTask->id;
+                $data = [$newTaskId, $taskName];
+                return $data;
             }
         }
     }
@@ -55,9 +59,20 @@ class AjaxController extends Controller
     public function delete(Request $request)
     {
         $listId = $request->idList;
-        if(auth()->user()->lists->pluck('id')->contains($listId)){
+        if (auth()->user()->lists->pluck('id')->contains($listId)) {
             $list = AList::find($listId);
             $list->delete();
+        }
+    }
+
+    public function deleteTask(Request $request)
+    {
+        $taskId = $request->taskId;
+        $listId = Task::find($taskId)->list->id;
+        if(auth()->user()->lists->pluck('id')->contains($listId)){
+            return auth()->user()->lists->pluck('id');
+            $task = Task::find($taskId);
+            $task->delete();
         }
     }
 }
