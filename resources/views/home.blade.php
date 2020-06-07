@@ -64,10 +64,18 @@
                     for(i=0;i<tasks[1].length;i++) {
                         div = $('<div></div>');
                         div.addClass('justify-content-between d-flex tasksDiv');
+                        div.attr('id','taskDiv'+tasks[0][i]);
                         oneTask = $("<h4></h4>").text(tasks[1][i]);
                         oneTask.addClass("task");
                         div.append(oneTask);
-                        modifyDiv = $('<div></div>').html('<i class="fas fa-2x fa-check mr-4 text-info"></i><i onClick=deleteTask('+tasks[0][i]+') class="fas fa-2x fa-times text-danger"></i>');
+                        modifyDiv = $('<div></div>');
+                        check = $('<i></i>');
+                        check.addClass('fas fa-2x fa-check mr-4 text-info');
+                        modifyDiv.append(check);
+                        del = $('<i></i>');
+                        del.addClass('fas fa-2x fa-times text-danger');
+                        del.on('click', deleteTask(tasks[0][i]));
+                        modifyDiv.append(del);
                         div.append(modifyDiv);
                         $("#tasksDiv").append(div);
                     }
@@ -119,10 +127,18 @@
             success: function( data ) {
                 div = $('<div></div>');
                 div.addClass('justify-content-between d-flex tasksDiv');
+                div.attr('id','taskDiv'+data[0]);
                 oneTask = $("<h4></h4>").text(data[1]);
                 oneTask.addClass("task");
                 div.append(oneTask);
-                modifyDiv = $('<div></div>').html('<i class="fas fa-2x fa-check mr-4 text-info"></i><i onClick=deleteTask('+data[0]+') class="fas fa-2x fa-times text-danger"></i>');
+                modifyDiv = $('<div></div>');
+                check = $('<i></i>');
+                check.addClass('fas fa-2x fa-check mr-4 text-info');
+                modifyDiv.append(check);
+                del = $('<i></i>');
+                del.addClass('fas fa-2x fa-times text-danger');
+                del.on('click', deleteTask(data[0]));
+                modifyDiv.append(del);
                 div.append(modifyDiv);
                 $("#tasksDiv").append(div);
                 $('#task').val('');
@@ -152,16 +168,21 @@
     }
 
     function deleteTask(id){
-        if(id !== ""){
-            $.ajax({
-            type:'POST',
-            url:'/task/delete',
-            data:{_token: "{{ csrf_token() }}", taskId: id
-            },
-            success: function( data ) {
-                console.log(data);
+        return function(){
+            idTask = id;
+            if(idTask !== ""){
+                $.ajax({
+                    type:'POST',
+                    url:'/task/delete',
+                    data:{_token: "{{ csrf_token() }}", taskId: idTask
+                    },
+                    success: function( data ) {
+                        taskDiv = "#taskDiv"+idTask;
+                        $(taskDiv).remove();
+                    }
+                }); 
             }
-        });
         }
+        
     }
 </script>

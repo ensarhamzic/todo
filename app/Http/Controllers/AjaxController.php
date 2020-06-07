@@ -68,9 +68,9 @@ class AjaxController extends Controller
     public function deleteTask(Request $request)
     {
         $taskId = $request->taskId;
-        $listId = Task::find($taskId)->list->id;
+        $task = Task::find($taskId);
+        $listId = $task->list->id;
         if(auth()->user()->lists->pluck('id')->contains($listId)){
-            $task = Task::find($taskId);
             $task->delete();
         }
     }
